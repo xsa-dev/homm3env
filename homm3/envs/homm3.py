@@ -4,20 +4,37 @@ import numpy as np
 
 import gym
 from gym import error, spaces, utils
-from gym.utils import seeding 
-from gym.wrappers import Monitor # to video record
+from gym.utils import seeding
+from gym.wrappers import Monitor  # to video record
 
+import subprocess
+
+# CONSTANTS
 GAME = None
+BUILD_FOLDER_PATH = r"/home/xsa/DEV/xsa-dev/grpc/examples/cpp/vcmi/cmake/build"
+EXE_PATH_CLIENT = r"bin/vcmiclient"
+EXE_PATH_SERVER = r"bin/vcmiserver"
+EXE_PATH_SERVICE = "greeter_async_server"
 
 
 class Homm3Env(gym.Env):
-    metadata = {'render.modes': ['human']}
+    metadata = {'render.modes': ['human', 'rgb_array']}
 
     def __init__(self):
         self.action_space = spaces.Discrete(4)
         self.reset()
         self.STEP_LIMIT = 1000
         self.sleep = 0
+        # start cpp env
+        # subprocess.check_output(f"{BUILD_FOLDER_PATH}/{EXE_PATH_SERVER}")
+        subprocess.check_output(r'/home/xsa/DEV/xsa-dev/grpc/examples/cpp/vcmi/cmake/build/bin/vcmiclient')
+
+        # run it:
+        # server only
+        # server and client locally
+        # server and client host, client join
+        # many client on one host
+        # finish
 
     def step(self, action):
         scoreholder = self.score
@@ -27,11 +44,11 @@ class Homm3Env(gym.Env):
         reward = self.farm_handler()
         self.update_game_state()
         reward, done = self.game_over(reward)
-        img = self.get_image_from_game()
+        state = self.get_state_from_service()
         info = {"score": self.score}
         self.steps += 1
         time.sleep(self.sleep)
-        return img, reward, done, info
+        return state, reward, done, info
 
     @staticmethod
     def scan_direction(action, direction):
@@ -81,10 +98,10 @@ class Homm3Env(gym.Env):
         # return get_game_state_from_server()
         pass
 
-    def get_image_from_game(self):
+    def get_state_from_service(self):
         # or use
-        img = None
-        return img
+        state = None
+        return state
 
     def game_over(self, reward):
         if self.hero_pos[0] < 0 or self.hero_pos[0] > self.frame_size_x-10:
