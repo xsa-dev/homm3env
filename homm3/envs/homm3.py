@@ -26,8 +26,7 @@ class Homm3Env(gym.Env):
         self.STEP_LIMIT = 1000
         self.sleep = 0
         # start cpp env
-        # subprocess.check_output(f"{BUILD_FOLDER_PATH}/{EXE_PATH_SERVER}")
-        subprocess.check_output(r'/home/xsa/DEV/xsa-dev/grpc/examples/cpp/vcmi/cmake/build/bin/vcmiclient')
+
 
         # run it:
         # server only
