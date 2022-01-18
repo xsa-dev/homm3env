@@ -23,7 +23,7 @@ logging.info('info')
 class HoMM3BattleTCPHandler(socketserver.BaseRequestHandler):
 
     def handle(self):
-        data = self.request.recv(1024).strip()
+        data = self.request.recv(32000).strip()
         json_data = json.loads(data)
         logging.info(f'{json_data}')
         # TODO: logic
