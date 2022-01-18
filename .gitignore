@@ -2,3 +2,5 @@ homm3/__pycache__/*
 homm3.egg-info
 homm3/envs/__pycache__/*
 
+*.log
+*.iml

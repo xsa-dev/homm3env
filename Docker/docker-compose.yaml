@@ -1,0 +1,17 @@
+version: "3.9"
+
+services:
+  vcmi-server:
+    container_name: vcmi-server
+    image: vcmi:latest
+    ports:
+      - "3030:3030"
+    restart: always
+    environment:
+      XDG_RUNTIME_DIR: /root/.local/share/vcmi
+      MAP: MAPS\Deluge.h3m
+    # TODO: update for vcmiclient
+    # command: /build/bin/vcmiclient --headless --testmap ${MAP}
+    command: /build/bin/vcmiserver
+    volumes:
+      - ./gamedata/:/root/.local/share/vcmi
