@@ -8,7 +8,6 @@ services:
       - "3030:3030"
     restart: always
     environment:
-      XDG_RUNTIME_DIR: /root/.local/share/vcmi
       MAP: MAPS\Deluge.h3m
     # TODO: update for vcmiclient
     # command: /build/bin/vcmiclient --headless --testmap ${MAP}

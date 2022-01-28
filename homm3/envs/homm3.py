@@ -7,7 +7,8 @@ from gym import error, spaces, utils
 from gym.utils import seeding
 from gym.wrappers import Monitor  # to video record
 
-import subprocess
+import os
+import homm3_battle_server as homm3api
 
 # CONSTANTS
 GAME = None
@@ -18,9 +19,20 @@ EXE_PATH_SERVICE = "greeter_async_server"
 
 
 class Homm3Env(gym.Env):
-    metadata = {'render.modes': ['human', 'rgb_array']}
+    metadata = {'render.modes': ['headless',
+                                 'human',
+                                 'rgb_array']}
+
+
+    def start_test_battle(self):
+        vcmi_client_path_with_args = \
+            '/Users/xsa-osx/DEV/cmake/bin/vcmiclient --spectate --spectate-hero-speed 1 \
+              --spectate-battle-speed 1 --spectate-skip-battle-result --onlyAI --ai EmptyAI \
+               --disable-video --testmap "Maps/template-d1.h3m" --headless'
+        os.system(vcmi_client_path_with_args + ' > /dev/null 2>&1')
 
     def __init__(self):
+        self.server = homm3api.HoMM3BattleTCPHandler()
         self.action_space = spaces.Discrete(4)
         self.reset()
         self.STEP_LIMIT = 1000
@@ -28,8 +40,10 @@ class Homm3Env(gym.Env):
         # start cpp env
 
 
+
         # run it:
         # server only
+        self.server.start_ai_server()
         # server and client locally
         # server and client host, client join
         # many client on one host
