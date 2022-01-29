@@ -23,7 +23,6 @@ class Homm3Env(gym.Env):
                                  'human',
                                  'rgb_array']}
 
-
     def start_test_battle(self):
         vcmi_client_path_with_args = \
             '/Users/xsa-osx/DEV/cmake/bin/vcmiclient --spectate --spectate-hero-speed 1 \
@@ -38,8 +37,6 @@ class Homm3Env(gym.Env):
         self.STEP_LIMIT = 1000
         self.sleep = 0
         # start cpp env
-
-
 
         # run it:
         # server only
@@ -117,9 +114,9 @@ class Homm3Env(gym.Env):
         return state
 
     def game_over(self, reward):
-        if self.hero_pos[0] < 0 or self.hero_pos[0] > self.frame_size_x-10:
+        if self.hero_pos[0] < 0 or self.hero_pos[0] > self.frame_size_x - 10:
             return -1, True
-        if self.hero_pos[1] < 0 or self.hero_pos[1] > self.frame_size_y-10:
+        if self.hero_pos[1] < 0 or self.hero_pos[1] > self.frame_size_y - 10:
             return -1, True
 
         if self.steps >= 1000:
