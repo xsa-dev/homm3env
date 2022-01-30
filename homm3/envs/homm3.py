@@ -31,7 +31,7 @@ class Homm3Env(gym.Env):
         os.system(vcmi_client_path_with_args + ' > /dev/null 2>&1')
 
     def __init__(self):
-        self.server = homm3api.HoMM3BattleTCPHandler()
+        self.server = homm3api.TcpHandler()
         self.action_space = spaces.Discrete(4)
         self.reset()
         self.STEP_LIMIT = 1000
