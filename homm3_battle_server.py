@@ -6,7 +6,7 @@ import sys
 import threading
 from datetime import datetime
 
-from libs.common import start_vcmi_test_battle, get_thread_by_name
+from libs.common import start_vcmi_test_battle
 from libs.tcpserver import TcpServer
 
 logging.basicConfig(
@@ -17,6 +17,7 @@ logging.basicConfig(
         logging.StreamHandler()
     ]
 )
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Process some integers.')
@@ -46,9 +47,11 @@ if __name__ == "__main__":
     # test battle start
     test_game_thread = threading.Thread(
         target=start_vcmi_test_battle,
+        args=[True],
         name='vcmi'
     )
-    start_vcmi_test_battle(headless=True)
+    test_game_thread.start()
+    test_game_thread.join()
     logging.info('Game done.')
 
     tcp_server.stop_tcp_server(method='Simple')

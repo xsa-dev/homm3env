@@ -9,6 +9,7 @@ def kill_vcmi():
     os.system('killall vcmiclient')
     logging.info('Vcmi killed.')
 
+kill_vcmi()
 
 def start_vcmi_test_battle(headless=False):
     vcmi_client_path_with_args = \

@@ -9,7 +9,6 @@ logger = logging.getLogger(__name__)
 
 BYTES_LENGHT = 32000
 
-
 class TcpServer:
     def __init__(self):
         self.server = None
@@ -46,35 +45,7 @@ class TcpServer:
             logging.critical(msg=f'Problem: {str(ex)}')
             sys.exit(1)
 
-    def start_simple_tcp_server(self, host: str, port: int):
-        import socket
-        # Задаем адрес сервера
-        SERVER_ADDRESS = (host, port)
 
-        # Настраиваем сокет
-        server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-
-        # Помечаем чтобы менй пустил дальше
-        self.server = True
-
-        server_socket.bind(SERVER_ADDRESS)
-        server_socket.listen(1)
-        logging.info('Simple Tcp Server is running.')
-
-        # Слушаем запросы
-        while self.server:
-            connection, address = server_socket.accept()
-            logging.info("new connection from {address}".format(address=address))
-
-            data = connection.recv(BYTES_LENGHT)
-
-            # logic
-            json_data = json.loads(data)
-            action = hom3instance().json_handler_logic(request=json_data)
-            connection.send(json.dumps(action).encode('ascii'))
-            # close?
-            connection.close()
 
     def stop_tcp_server(self, method=None):
         if method is None:
@@ -84,6 +55,3 @@ class TcpServer:
                 logging.info('Server stopped.')
             else:
                 logging.info('Server was not started.')
-        else:
-            self.server = False
-            self.exit = True

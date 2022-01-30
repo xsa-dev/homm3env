@@ -1,9 +1,14 @@
+import json
+
 from typing import Dict
 
 from datetime import datetime
 import logging
+
+
 logger = logging.getLogger(__name__)
 
+BYTES_LENGHT = 32000
 BLOCK_LOGIC = True
 DEFAULT_LOGIC = False
 COMPUTER = 'LeftUser'
@@ -30,6 +35,7 @@ class hom3instance:
         self.tcp_responses_counter = 0
         self.last_connection_timestamp = 0
         self.is_service_active = None
+        self.current_connection = None
 
         # game state variables
         self.winner = None
@@ -44,6 +50,8 @@ class hom3instance:
         self.is_player = None
         self.player_units = None
         self.player_possible_moves = None
+
+        self.env_function = None
 
     def get_service_active_state(self) -> bool:
         # show timeout service state response
@@ -95,3 +103,37 @@ class hom3instance:
         logging.info(f'{self.tcp_responses_counter}')
         logging.info(f'@@@@ {self.last_connection_timestamp} @@@@')
         return action
+
+    def start_simple_tcp_server(self, host: str, port: int):
+        import socket
+        # Задаем адрес сервера
+        SERVER_ADDRESS = (host, port)
+
+        # Настраиваем сокет
+        server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+
+        # Помечаем чтобы менй пустил дальше
+        self.server = True
+
+        server_socket.bind(SERVER_ADDRESS)
+        server_socket.listen(1)
+        logging.info('Simple Tcp Server is running.')
+
+        # Слушаем запросы
+        while self.server:
+            connection, address = server_socket.accept()
+            logging.info("new connection from {address}".format(address=address))
+            data = connection.recv(BYTES_LENGHT)
+
+            # processing logic
+            json_data = json.loads(data)
+            action = self.json_handler_logic(request=json_data)
+
+            # to vcmi
+            connection.send(json.dumps(action).encode('ascii'))
+            # TODO: minor fix always open vcmiclient port
+            connection.close()
+
+    def send_test_packet_for_current_connection(self):
+        pass
