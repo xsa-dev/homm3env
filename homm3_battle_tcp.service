@@ -1,0 +1,16 @@
+[Unit]
+Description = <Your service description here>
+After = network.target # Assuming you want to start after network interfaces are made available
+
+[Service]
+Type = simple
+ExecStart =  python3 homm3_battle_server.py --host ec2-54-85-137-63.compute-1.amazonaws.com
+User = ubuntu # User to run the script as
+Group = ubuntu #
+Restart = on-failure
+SyslogIdentifier = HoMM3_TCP_Service
+RestartSec = 5
+TimeoutStartSec = infinity
+
+[Install]
+WantedBy = multi-user.target
