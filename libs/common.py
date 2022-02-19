@@ -6,10 +6,11 @@ logger = logging.getLogger(__name__)
 
 
 def kill_vcmi():
-    os.system('killall vcmiclient')
+    os.system("killall -9 vcmiclient")
+#     os.system('killall vcmiclient')
     logging.info('Vcmi killed.')
 
-kill_vcmi()
+# kill_vcmi()
 
 def start_vcmi_test_battle(headless=False):
     vcmi_client_path_with_args = \
