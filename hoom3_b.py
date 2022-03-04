@@ -1,17 +1,14 @@
-import time
-
-import sys
-
 import argparse
 import json
 import logging
-import random
-import threading
 import multiprocessing
-from datetime import datetime
+import random
 import socket
+import sys
+import threading
+import time
+from datetime import datetime
 from gym import Env
-import os
 
 from libs.common import start_vcmi_test_battle, kill_vcmi
 
@@ -32,8 +29,8 @@ server_last_packet_time = None
 class HoMM3_B(Env):
 
     def __init__(self):
+        self.state = None
         logging.info('Проверьте включен ли BattleML в настройках vcmilauncher')
-        pass
 
     def tcp_service(self):
         # Задаем адрес сервера
@@ -64,12 +61,13 @@ class HoMM3_B(Env):
             json_data = json.loads(data)
             request = json_data
             conn = connection
-            print(connection)
+            logging.info(connection)
 
     def step(self, action):
         # ждёт запроса от среды о отдаёт действие
         global request
         global conn
+
         if request is None or conn is None:
             # ждёт пока появиться подключение
             # никаких поощрений или штрафов
@@ -87,7 +85,6 @@ class HoMM3_B(Env):
 
         if len(request["actions"]["possibleAttacks"]) > 0:
             rand_int = random.randint(0, len(request['actions']['possibleAttacks']))
-
             attack = request["actions"]["possibleAttacks"][0]
             jaction = {
                 "type": 1 if attack["shooting"] else 2,
@@ -96,11 +93,12 @@ class HoMM3_B(Env):
             }
         elif len(request["actions"]["possibleMoves"]) > 0:
             rand_int = random.randint(0, len(request["actions"]["possibleMoves"]))
-
             jaction = {
                 "type": 0,  # TODO: testing
                 "moveToHex": request["actions"]["possibleMoves"][0]  # TODO testing
             }
+
+        # debug trace
         logging.info(f'{request}')
         logging.info(f'{jaction}')
 
@@ -108,6 +106,7 @@ class HoMM3_B(Env):
         conn.send(json.dumps(jaction).encode('ascii'))
         # TODO: minor fix always open vcmiclient port
         conn.close()
+
         conn = None
         request = None
 
@@ -115,8 +114,11 @@ class HoMM3_B(Env):
         reward = 1
         done = False
         self.state -= 1
+
         if self.state <= 0:
             done = True
+
+        # info
         info = dict()
 
         return self.state, reward, done, info
@@ -136,6 +138,10 @@ class HoMM3_B(Env):
 
         # state
         self.state = 5
+
+
+
+        return self.state
 
     def render(self):
         pass
@@ -159,11 +165,7 @@ if __name__ == "__main__":
 
     env = HoMM3_B()
 
-    # env.test_game_thread.start()
-    # env.test_game_thread.join()
-    # logging.info('Game done.')
-
-    episodes = 10
+    episodes = 5
     for episode in range(1, episodes + 1):
         # reset сервер и vcmi
         state = env.reset()
@@ -176,7 +178,7 @@ if __name__ == "__main__":
             # ждем включения tcp сервиса
             if conn is None:
                 if server_last_packet_time is not None:
-                    if datetime.now().timestamp() - server_last_packet_time > 30.0:
+                    if datetime.now().timestamp() - server_last_packet_time > 20.0:
                         server_last_packet_time = datetime.now().timestamp()
                         logging.warning('Service not respond.')
                         kill_vcmi()
