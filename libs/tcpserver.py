@@ -3,7 +3,7 @@ import json
 import logging
 import sys
 
-from libs.homm3_state import hom3instance
+from libs.homm3_state import homm3instance
 
 logger = logging.getLogger(__name__)
 
@@ -21,7 +21,7 @@ class TcpServer:
             json_data = json.loads(data)
             # TODO: to ML predictions
             try:
-                action = hom3instance().json_handler_logic(request=json_data)
+                action = homm3instance().json_handler_logic(request=json_data)
             except Exception as ex:
                 raise ex
 

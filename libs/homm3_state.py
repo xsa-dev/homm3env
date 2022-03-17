@@ -8,6 +8,8 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
+# TODO: from main or config?
 BYTES_LENGHT = 32000
 BLOCK_LOGIC = True
 DEFAULT_LOGIC = False
@@ -28,7 +30,7 @@ def singleton(class_):
 
 
 @singleton
-class hom3instance:
+class homm3instance:
     def __init__(self):
         # server state variables (default)
         self.current_team = None
