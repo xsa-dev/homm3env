@@ -10,6 +10,7 @@ def kill_vcmi():
     os.system("killall -9 vcmiclient")
     logging.info('vcmi killed.')
 
+# kill_vcmi()
 
 def start_vcmi_test_battle(headless=False, release=True):
     # build paths

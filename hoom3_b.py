@@ -12,6 +12,8 @@ from gym import Env
 
 from libs.common import start_vcmi_test_battle, kill_vcmi
 
+from libs.homm3_state import homm3instance
+
 logging.basicConfig(
     level=logging.DEBUG,
     format="%(asctime)s [%(levelname)s] %(message)s",
@@ -30,6 +32,7 @@ class HoMM3_B(Env):
 
     def __init__(self):
         self.state = None
+        self.instance_state: homm3instance = homm3instance()
         logging.info('Проверьте включен ли BattleML в настройках vcmilauncher')
 
     def tcp_service(self):
@@ -59,16 +62,21 @@ class HoMM3_B(Env):
             server_last_packet_time = datetime.now().timestamp()
             # to processing logic
             json_data = json.loads(data)
+
+            # TODO: this is state for one agent or multy agents envs
+            self.instance_state.update(request=json_data)
+
             request = json_data
             conn = connection
             logging.info(connection)
 
     def step(self, action):
+        # wait from environment and make action
         # ждёт запроса от среды о отдаёт действие
         global request
         global conn
-
         if request is None or conn is None:
+            # continue
             # ждёт пока появиться подключение
             # никаких поощрений или штрафов
             self.state = self.state
@@ -77,42 +85,24 @@ class HoMM3_B(Env):
             info = {}
             return self.state, reward, done, info
 
-        print(self.state)
-        rand_int: int = 0
+        # logging выбора значений
+        target_varible: int = 0
+        jaction = self.instance_state.prediction(request, target_varible)
+        logging.info(f'>>> {self.instance_state.current_team}')
 
-        logging.info(f'{action}')
-        jaction = {"type": f"{action}"}
-
-        if len(request["actions"]["possibleAttacks"]) > 0:
-            rand_int = random.randint(0, len(request['actions']['possibleAttacks']))
-            attack = request["actions"]["possibleAttacks"][0]
-            jaction = {
-                "type": 1 if attack["shooting"] else 2,
-                "targetId": attack["defenderId"],
-                "moveToHex": attack["moveToHex"]
-            }
-        elif len(request["actions"]["possibleMoves"]) > 0:
-            rand_int = random.randint(0, len(request["actions"]["possibleMoves"]))
-            jaction = {
-                "type": 0,  # TODO: testing
-                "moveToHex": request["actions"]["possibleMoves"][0]  # TODO testing
-            }
-
-        # debug trace
-        logging.info(f'{request}')
-        logging.info(f'{jaction}')
-
-        # to vcmi
-        conn.send(json.dumps(jaction).encode('ascii'))
+        # waiting for new connection
+        # send to vcmi battle ml service
         # TODO: minor fix always open vcmiclient port
+        # TODO: refactor please
+        conn.send(json.dumps(jaction).encode('ascii'))
         conn.close()
-
         conn = None
         request = None
 
-        #
+        # step reward
         reward = 1
         done = False
+        # minimization for army
         self.state -= 1
 
         if self.state <= 0:
@@ -137,9 +127,7 @@ class HoMM3_B(Env):
         self.start_vcmi_thred()
 
         # state
-        self.state = 5
-
-
+        self.state = 10
 
         return self.state
 
@@ -155,6 +143,7 @@ class HoMM3_B(Env):
         )
         self.homm3_game.start()
 
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Process some integers.')
     parser.add_argument('--port', dest='port', default=9999,
@@ -165,14 +154,12 @@ if __name__ == "__main__":
 
     env = HoMM3_B()
 
-    episodes = 5
+    episodes = 1
     for episode in range(1, episodes + 1):
         # reset сервер и vcmi
         state = env.reset()
-
         done = False
         score = 0
-
         # пока игра не закончена
         while not done:
             # ждем включения tcp сервиса
@@ -192,6 +179,5 @@ if __name__ == "__main__":
             n_state, reward, done, info = env.step(action)
             # увеличиванием награду
             score += reward
-
         print('Episode:{} Score:{}'.format(episode, score))
     kill_vcmi()

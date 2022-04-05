@@ -21,7 +21,7 @@ class TcpServer:
             json_data = json.loads(data)
             # TODO: to ML predictions
             try:
-                action = homm3instance().json_handler_logic(request=json_data)
+                action = homm3instance().update(request=json_data)
             except Exception as ex:
                 raise ex
 

@@ -1,13 +1,9 @@
 import json
-
 from typing import Dict
-
 from datetime import datetime
 import logging
 
-
 logger = logging.getLogger(__name__)
-
 
 # TODO: from main or config?
 BYTES_LENGHT = 32000
@@ -53,6 +49,16 @@ class homm3instance:
         self.player_units = None
         self.player_possible_moves = None
 
+        # army
+        self.total_health_left = 0
+        self.left_army_count = 0
+
+        # possible attacks
+        self.possible_attacks = None
+
+        # possible movies
+        self.possible_moves = None
+
         self.env_function = None
 
     def get_service_active_state(self) -> bool:
@@ -69,12 +75,24 @@ class homm3instance:
         else:
             self.winner = COMPUTER
 
-    def json_handler_logic(self, request) -> Dict:
-        logging.info(f'@@@@ {self.current_team} @@@@')
+    def update(self, request) -> Dict:
         self.tcp_responses_counter += 1
         self.last_connection_timestamp = datetime.now().timestamp()
         self.is_service_active = self.get_service_active_state()
-        # определяем за кого сейчас определяется действие
+        self.possible_attacks = len(request['actions']['possibleAttacks'])
+        self.possible_moves = len(request['actions']['possibleMoves'])
+
+        self.total_health_left = 0
+        for stack in request['stacks']:
+            if stack['stackCount'] is not None:
+                self.total_health_left += int(stack['totalHealthLeft'])
+
+        self.left_army_count = 0
+        for stack in request['stacks']:
+            if stack['stackCount'] is not None:
+                self.left_army_count += int(stack['stackCount'])
+
+
         if request['currentSide'] == 0:
             self.current_team = USER
             self.is_computer = False
@@ -84,11 +102,14 @@ class homm3instance:
             self.is_computer = True
             self.is_player = False
 
-        # if BLOCK_LOGIC:
-        #    time.sleep(60)
+        logging.info(f'possible attacks: {self.possible_attacks}')
+        logging.info(f'possible moves: {self.possible_moves}')
+        logging.info(f'army count: {str(self.left_army_count)}')
+        logging.info(f'army total health: {str(self.total_health_left)}')
+        logging.info(f'request: {request}')
 
-        logging.info(f'{request}')
-        action = {"type": "4"}
+    def prediction(self, request, target_varible=0):
+        # logging.info(f'request: {request}')
         if len(request["actions"]["possibleAttacks"]) > 0:
             attack = request["actions"]["possibleAttacks"][0]
             action = {
@@ -101,9 +122,9 @@ class homm3instance:
                 "type": 0,
                 "moveToHex": request["actions"]["possibleMoves"][0]
             }
-        logging.info(f'{action}')
-        logging.info(f'{self.tcp_responses_counter}')
-        logging.info(f'@@@@ {self.last_connection_timestamp} @@@@')
+        # logging.info(f'action: {action}')
+        # logging.info(f'responses: {self.tcp_responses_counter}')
+        # logging.info(f'@@@@ {self.last_connection_timestamp} @@@@')
         return action
 
     def start_simple_tcp_server(self, host: str, port: int):
@@ -130,7 +151,7 @@ class homm3instance:
 
             # processing logic
             json_data = json.loads(data)
-            action = self.json_handler_logic(request=json_data)
+            action = self.update(request=json_data)
 
             # to vcmi
             connection.send(json.dumps(action).encode('ascii'))
