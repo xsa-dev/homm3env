@@ -3,24 +3,28 @@ import threading
 import os
 import logging
 logger = logging.getLogger(__name__)
-
+import subprocess
 
 def kill_vcmi():
-    os.system("killall -9 vcmiclient")
+    os.system('taskkill /IM "VCMI_server.exe" /F')
 #     os.system('killall vcmiclient')
-    logging.info('Vcmi killed.')
+    print('Vcmi killed.')
 
 # kill_vcmi()
 
 def start_vcmi_test_battle(headless=False):
     vcmi_client_path_with_args = \
-        '/Users/xsa-osx/DEV/cmake/bin/vcmiclient --spectate --spectate-hero-speed 1 \
-          --spectate-battle-speed 1 --spectate-skip-battle-result --onlyAI --ai EmptyAI \
-           --disable-video --testmap Maps/template-d1.h3m'
+        r'C:\VCMI\build\bin\Release\VCMI_client.exe'
+        # r'C:\VCMI\build\bin\Release\VCMI_client.exe --spectate --spectate-hero-speed 1 --spectate-battle-speed 1 --spectate-skip-battle-result --onlyAI --ai EmptyAI --disable-video --testmap C:\\VCMI\build\bin\Release\maps\template-d1.h3m'
+
+    # print('SYSTEM')
+    list_for_command = [vcmi_client_path_with_args, '--testmap', 'Maps/template_d1.h3m', '--spectate', '--spectate-hero-speed', '1', '--spectate-battle-speed', '3', '--spectate-skip-battle-result', '--onlyAI', '--ai', 'BattleML', '--disable-video']
     if headless:
-        vcmi_client_path_with_args += ' --headless'
-    os.system(vcmi_client_path_with_args + ' > /dev/null 2>&1')
-    logging.info('Vcmi started.')
+        list_for_command.append('--headless')
+    # print(list_for_command)
+    subprocess.run(list_for_command)
+    print('Vcmi started.')
+    # print('start_vcmi_test_battle')
 
 
 def get_thread_by_name(name):

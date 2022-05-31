@@ -4,7 +4,7 @@ import sys
 
 import argparse
 import json
-import logging
+# import logging
 import random
 import threading
 import multiprocessing
@@ -15,14 +15,14 @@ import os
 
 from libs.common import start_vcmi_test_battle, kill_vcmi
 
-logging.basicConfig(
-    level=logging.DEBUG,
-    format="%(asctime)s [%(levelname)s] %(message)s",
-    handlers=[
-        logging.StreamHandler(sys.stdout),
-        logging.FileHandler(f"logs/{str(datetime.now().date())}.log"),
-    ]
-)
+# logging.basicConfig(
+#     level=logging.DEBUG,
+#     format="%(asctime)s [%(levelname)s] %(message)s",
+#     handlers=[
+#         logging.StreamHandler(sys.stdout),
+#         logging.FileHandler(f"logs/{str(datetime.now().date())}.log"),
+#     ]
+# )
 
 conn = None
 request = None
@@ -32,8 +32,8 @@ server_last_packet_time = None
 class HoMM3_B(Env):
 
     def __init__(self):
-        logging.info('Проверьте включен ли BattleML в настройках vcmilauncher')
-        pass
+        self.state = None
+        print('Проверьте включен ли BattleML в настройках vcmilauncher')
 
     def tcp_service(self):
         # Задаем адрес сервера
@@ -48,7 +48,7 @@ class HoMM3_B(Env):
 
         server_socket.bind(SERVER_ADDRESS)
         server_socket.listen(1)
-        logging.info('Simple Tcp Server is running.')
+        print('Simple Tcp Server is running.')
 
         # Слушаем запросы
         while self.server:
@@ -56,7 +56,7 @@ class HoMM3_B(Env):
             global request
             global server_last_packet_time
             connection, address = server_socket.accept()
-            logging.info("new connection from {address}".format(address=address))
+            print("new connection from {address}".format(address=address))
             data = connection.recv(32000)
             # фиксируем последнее обращение
             server_last_packet_time = datetime.now().timestamp()
@@ -64,7 +64,7 @@ class HoMM3_B(Env):
             json_data = json.loads(data)
             request = json_data
             conn = connection
-            print(connection)
+            # print('CONNECTION: ', connection)
 
     def step(self, action):
         # ждёт запроса от среды о отдаёт действие
@@ -73,17 +73,17 @@ class HoMM3_B(Env):
         if request is None or conn is None:
             # ждёт пока появиться подключение
             # никаких поощрений или штрафов
-            self.state = self.state
             reward = 0
             done = False
             info = {}
             return self.state, reward, done, info
 
-        print(self.state)
+        print('STATE: ', self.state)
         rand_int: int = 0
 
-        logging.info(f'{action}')
+        print('ACTION: ', f'{action}')
         jaction = {"type": f"{action}"}
+        print('REQUEST: ', f"{request}")
 
         if len(request["actions"]["possibleAttacks"]) > 0:
             rand_int = random.randint(0, len(request['actions']['possibleAttacks']))
@@ -101,8 +101,8 @@ class HoMM3_B(Env):
                 "type": 0,  # TODO: testing
                 "moveToHex": request["actions"]["possibleMoves"][0]  # TODO testing
             }
-        logging.info(f'{request}')
-        logging.info(f'{jaction}')
+        # print('REQUEST: \n', f'{request}')
+        print(f'{jaction}')
 
         # to vcmi
         conn.send(json.dumps(jaction).encode('ascii'))
@@ -121,7 +121,7 @@ class HoMM3_B(Env):
 
         return self.state, reward, done, info
 
-    def reset(self):
+    def reset(self, **kwargs):
         if not hasattr(self, 'simple_service'):
             self.simple_service = threading.Thread(
                 target=self.tcp_service,
@@ -137,13 +137,14 @@ class HoMM3_B(Env):
         # state
         self.state = 5
 
-    def render(self):
+
+    def render(self, **kwargs):
         pass
 
     def start_vcmi_thred(self):
         self.homm3_game = multiprocessing.Process(
             target=start_vcmi_test_battle,
-            args=[True],
+            args=[False],
             name='vcmi',
             daemon=True
         )
@@ -161,10 +162,12 @@ if __name__ == "__main__":
 
     # env.test_game_thread.start()
     # env.test_game_thread.join()
-    # logging.info('Game done.')
+    # print('Game done.')
 
     episodes = 10
     for episode in range(1, episodes + 1):
+        print('episode \n--------------------')
+
         # reset сервер и vcmi
         state = env.reset()
 
@@ -178,7 +181,7 @@ if __name__ == "__main__":
                 if server_last_packet_time is not None:
                     if datetime.now().timestamp() - server_last_packet_time > 30.0:
                         server_last_packet_time = datetime.now().timestamp()
-                        logging.warning('Service not respond.')
+                        # logging.warning('Service not respond.')
                         kill_vcmi()
                         env.start_vcmi_thred()
                 continue
