@@ -127,7 +127,7 @@ class HoMM3_B(Env):
         self.start_vcmi_thred()
 
         # state
-        self.state = 10
+        self.state = 20
 
         return self.state
 
@@ -137,7 +137,7 @@ class HoMM3_B(Env):
     def start_vcmi_thred(self):
         self.homm3_game = multiprocessing.Process(
             target=start_vcmi_test_battle,
-            args=[True],
+            args=[False],
             name='vcmi',
             daemon=True
         )
