@@ -1,4 +1,3 @@
-from time import time
 from homm3_b import HoMM3_B
 from datetime import datetime
 import argparse
@@ -6,12 +5,11 @@ import logging
 import random
 import sys
 
-import time
 
 #### TEST ITERATIONS ####
 EPISODES = 2
 #### TEST VARIABLES ####
-IS_HEADLESS = False
+IS_HEADLESS = True
 
 
 logging.basicConfig(
@@ -53,8 +51,7 @@ if __name__ == "__main__":
                 n_state, reward, done, info = env.step(action)
             except Exception as ex:
                 logging.error(str(ex))
-                n_state, reward, done, info = env.state, 0, False, {
-                    'error': str(ex)}
+                n_state, reward, done, info = env.state, 0, False, {'error': str(ex)}
                 env.reset()
             # увеличиванием награду
             score += reward
