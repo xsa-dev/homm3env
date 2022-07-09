@@ -67,7 +67,7 @@ class ml_service:
 
         self.env_function = None
 
-        # TODO: 
+        # TODO: compute variables for get battale result function
         self.last_computer_request = None
         self.last_ml_request = None
 
@@ -124,7 +124,7 @@ class ml_service:
             logging.info(f'request: {request}')
 
     def prediction(self, request, target_varible=0):
-        # TODO: this is fake logic, need implement real ml logic
+        # TODO: this is fake logic, need implement real ml magic
         if len(request["actions"]["possibleAttacks"]) > 0:
             attack = request["actions"]["possibleAttacks"][0]
             action = {
@@ -141,41 +141,10 @@ class ml_service:
         return action
 
     def dump_to_json(self, research_folder):
-        #  TODO: implement save responses from RAM
+        #  TODO: implement save responses from RAM for compleate research
+        # TODO: note: need only if problems with engine and reboot not works well
         pass
 
-
-    # @deprecation.deprecated(deprecated_in="1.0", removed_in="2.0",
-    #                     details="Use the bar function instead")
-    # def start_simple_tcp_server(self, host: str, port: int):
-    #     import socket
-    #     # Задаем адрес сервера
-    #     SERVER_ADDRESS = (host, port)
-
-    #     # Настраиваем сокет
-    #     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    #     server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-
-    #     # Помечаем чтобы менй пустил дальше
-    #     self.server = True
-
-    #     server_socket.bind(SERVER_ADDRESS)
-    #     server_socket.listen(1)
-    #     logging.info('Simple Tcp Server is running. 1')
-
-    #     # Слушаем запросы
-    #     while self.server:
-    #         connection, address = server_socket.accept()
-    #         logging.info("new connection from {address}".format(address=address))
-    #         data = connection.recv(BYTES_LENGHT)
-
-    #         # processing logic
-    #         json_data = json.loads(data)
-    #         action = self.update(request=json_data)
-
-    #         # to vcmi
-    #         connection.send(json.dumps(action).encode('ascii'))
-    #         connection.close()
 
     def send_heartbeat_to_vcmi_service(self):
         # TODO: implement logic for heartbeat current vcmi instance

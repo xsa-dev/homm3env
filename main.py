@@ -10,7 +10,8 @@ import time
 
 #### TEST ITERATIONS ####
 EPISODES = 2
-#########################
+#### TEST VARIABLES ####
+IS_HEADLESS = False
 
 
 logging.basicConfig(
@@ -32,7 +33,9 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # ENV test
-    env = HoMM3_B()
+    env = HoMM3_B(
+        headless=IS_HEADLESS
+        )
 
     for episode in range(1, EPISODES + 1):
         # reset сервер и vcmi
@@ -41,37 +44,23 @@ if __name__ == "__main__":
         score = 0
         # пока игра не закончена
         while not done:
-            logging.debug('START SLEEP')
-            time.sleep(3)
-            logging.debug('STOP SLEEP')
-
-            # ждем создания клиент
-            # if not check_client_started():
-            #    continue            # ждем включения  tcp сервиса
-            # if check_connection(env, conn, server_last_packet_time, CONNECTION_TIMEOUT):
-            #    continue
-
-            # if conn is None:
-            #     if env.server_last_packet_time is not None:
-            #         if datetime.now().timestamp() - env.server_last_packet_time > 20.0:
-            #             env.hard_reset()
-            #             # server_last_packet_time = datetime.now().timestamp()
-            #             # logging.warning('Service not respond.')
-            #             # kill_vcmi()
-            #             # env.start_vcmi_threaded()
-            #     continue
-
-
-
             # выполняем
             env.render()
             # выполнем выбор действия
             action = random.choice(env.actions())
             # получаем состояние, награду, признак завершения, информацию
-            n_state, reward, done, info = env.step(action)
+            try:
+                n_state, reward, done, info = env.step(action)
+            except Exception as ex:
+                logging.error(str(ex))
+                n_state, reward, done, info = env.state, 0, False, {
+                    'error': str(ex)}
+                env.reset()
             # увеличиванием награду
             score += reward
-            logging.info('Step: {} Score: {} Reward: {} Action: {} Done: {} Info: {}'.format(
+            logging.info('$$$ EPISODE: {}: Step: {} Score: {} Reward: {} Action: {} Done: {} Info: {}'.format(
+                episode,
                 n_state, score, reward, action, done, info))
 
-        logging.info('Episode:{} Score:{}'.format(episode, score))
+    logging.info('### Episodes:{}, Score:{} ###'.format(episode, score))
+    env.kill()

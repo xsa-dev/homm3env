@@ -95,3 +95,9 @@ def configure_tcp_socket():
     # TODO: exception handling
     except Exception as ex:
         raise ex
+
+def callback_vcmi(conn, json):
+    # TODO util for env step
+    conn.send(json.dumps(json).encode('ascii'))
+    conn.close()
+    
