@@ -2,6 +2,8 @@ import json
 from typing import Dict
 from datetime import datetime
 import logging
+import deprecation
+
 
 logger = logging.getLogger(__name__)
 
@@ -129,6 +131,9 @@ class homm3instance:
         # logging.info(f'@@@@ {self.last_connection_timestamp} @@@@')
         return action
 
+
+    @deprecation.deprecated(deprecated_in="1.0", removed_in="2.0",
+                        details="Use the bar function instead")
     def start_simple_tcp_server(self, host: str, port: int):
         import socket
         # Задаем адрес сервера
