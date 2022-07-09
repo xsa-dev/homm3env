@@ -9,9 +9,10 @@ logger = logging.getLogger(__name__)
 BYTES_LENGHT = 32000
 BLOCK_LOGIC = True
 DEFAULT_LOGIC = False
-COMPUTER = 'LeftUser'
-USER = 'RightUser'
+COMPUTER = 'COMPUTER'
+USER = 'ML'
 TIMEOUT = 0.1
+###########################
 
 
 def singleton(class_):
@@ -110,6 +111,7 @@ class homm3instance:
 
     def prediction(self, request, target_varible=0):
         # logging.info(f'request: {request}')
+        # TODO: this is fake logic, need implement real ml logic
         if len(request["actions"]["possibleAttacks"]) > 0:
             attack = request["actions"]["possibleAttacks"][0]
             action = {
@@ -141,7 +143,7 @@ class homm3instance:
 
         server_socket.bind(SERVER_ADDRESS)
         server_socket.listen(1)
-        logging.info('Simple Tcp Server is running.')
+        logging.info('Simple Tcp Server is running. 1')
 
         # Слушаем запросы
         while self.server:
@@ -155,7 +157,6 @@ class homm3instance:
 
             # to vcmi
             connection.send(json.dumps(action).encode('ascii'))
-            # TODO: minor fix always open vcmiclient port
             connection.close()
 
     def send_test_packet_for_current_connection(self):

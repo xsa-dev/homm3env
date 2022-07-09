@@ -7,10 +7,11 @@ import socket
 import sys
 import threading
 import time
-from datetime import datetime
+from datetime import datetime, timedelta
 from gym import Env
 
-from libs.common import start_vcmi_test_battle, kill_vcmi
+
+from libs.common import start_vcmi_test_battle, kill_vcmi, check_connection, check_client_started
 
 from libs.homm3_state import homm3instance
 
@@ -23,10 +24,22 @@ logging.basicConfig(
     ]
 )
 
+
+###### OPTIONS ######
+isHeadless = False
+states = 100
+CONNECTION_TIMEOUT = 10
+CREATION_TIMEOUT = 10
+EPISODES = 2
+#####################
+
+###### ENV VARIABLES ######
 conn = None
 request = None
 server_last_packet_time = None
-
+client_start_timestamp = datetime.now().timestamp()
+client_started = False
+#####################
 
 class HoMM3_B(Env):
 
@@ -48,7 +61,7 @@ class HoMM3_B(Env):
 
         server_socket.bind(SERVER_ADDRESS)
         server_socket.listen(1)
-        logging.info('Simple Tcp Server is running.')
+        logging.info('Simple Tcp Server is running. 2')
 
         # Слушаем запросы
         while self.server:
@@ -56,7 +69,8 @@ class HoMM3_B(Env):
             global request
             global server_last_packet_time
             connection, address = server_socket.accept()
-            logging.info("new connection from {address}".format(address=address))
+            logging.info(
+                "new connection from {address}".format(address=address))
             data = connection.recv(32000)
             # фиксируем последнее обращение
             server_last_packet_time = datetime.now().timestamp()
@@ -88,7 +102,7 @@ class HoMM3_B(Env):
         # logging выбора значений
         target_varible: int = 0
         jaction = self.instance_state.prediction(request, target_varible)
-        logging.info(f'>>> {self.instance_state.current_team}')
+        logging.info(f'>>> {self.instance_state.current_team} >>>')
 
         # waiting for new connection
         # send to vcmi battle ml service
@@ -99,12 +113,12 @@ class HoMM3_B(Env):
         conn = None
         request = None
 
-        # step reward
+        # TODO: if step success reward++ else reward
         reward = 1
         done = False
-        # minimization for army
-        self.state -= 1
 
+        # TODO: minimization for army here
+        self.state -= 1
         if self.state <= 0:
             done = True
 
@@ -124,20 +138,20 @@ class HoMM3_B(Env):
         # vcmi
         kill_vcmi()
         time.sleep(5)
-        self.start_vcmi_thred()
+        self.start_vcmi_threaded()
 
         # state
-        self.state = 10
+        self.state = states
 
         return self.state
 
     def render(self):
         pass
 
-    def start_vcmi_thred(self):
+    def start_vcmi_threaded(self):
         self.homm3_game = multiprocessing.Process(
             target=start_vcmi_test_battle,
-            args=[True],
+            args=[isHeadless],
             name='vcmi',
             daemon=True
         )
@@ -154,23 +168,28 @@ if __name__ == "__main__":
 
     env = HoMM3_B()
 
-    episodes = 1
-    for episode in range(1, episodes + 1):
+    for episode in range(1, EPISODES + 1):
         # reset сервер и vcmi
         state = env.reset()
         done = False
         score = 0
         # пока игра не закончена
         while not done:
-            # ждем включения tcp сервиса
+            # ждем создания клиент
+            # if not check_client_started():
+            #    continue            # ждем включения  tcp сервиса
+            # if check_connection(env, conn, server_last_packet_time, CONNECTION_TIMEOUT):
+            #    continue
+
             if conn is None:
                 if server_last_packet_time is not None:
                     if datetime.now().timestamp() - server_last_packet_time > 20.0:
                         server_last_packet_time = datetime.now().timestamp()
                         logging.warning('Service not respond.')
                         kill_vcmi()
-                        env.start_vcmi_thred()
+                        env.start_vcmi_threaded()
                 continue
+
             # выполняем
             env.render()
             # выполнем выбор действия
@@ -179,5 +198,9 @@ if __name__ == "__main__":
             n_state, reward, done, info = env.step(action)
             # увеличиванием награду
             score += reward
-        print('Episode:{} Score:{}'.format(episode, score))
+            logging.info('Step: {} Score: {} Reward: {} Action: {} Done: {} Info: {}'.format(
+                n_state, score, reward, action, done, info))
+
+        logging.info('Episode:{} Score:{}'.format(episode, score))
+
     kill_vcmi()
