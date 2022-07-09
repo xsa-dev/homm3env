@@ -4,16 +4,16 @@ import os
 import logging
 from datetime import datetime
 
+
 logger = logging.getLogger(__name__)
 
+import socket
 
 def kill_vcmi():
     os.system("killall -9 vcmiserver")
     os.system("killall -9 vcmiclient")
     logging.info('vcmi killed.')
 
-
-# kill_vcmi()
 
 def start_vcmi_test_battle(headless=False, release=True):
     # build paths
@@ -70,3 +70,28 @@ def check_client_started() -> bool:
     # logging.warning('Client started')
 
     return True
+
+
+def wait_request_or_conn(state, request, conn):
+    # continue
+    # ждёт пока появиться подключение
+    # никаких поощрений или штрафов
+    if request is None or conn is None:
+        return True
+    return state, 0, False, {}
+
+def configure_tcp_socket():
+    try:
+        SERVER_ADDRESS = ('localhost', 9999)
+        # Настраиваем сокет
+        server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        # TODO: will configure well
+        # server_socket.settimeout(10)
+        server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        server_socket.bind(SERVER_ADDRESS)
+        server_socket.listen(1)
+        logging.info('Simple Tcp Server is running. 2')
+        return server_socket
+    # TODO: exception handling
+    except Exception as ex:
+        raise ex
