@@ -1,0 +1,168 @@
+{"actions": {"canDefend": true, "canWait": true, "possibleAttacks": [
+      {"affectedUnitIds": [
+          2
+        ], "damageDealt": 25, "damageReceived": {"collateral": 0, "retalitation": 32
+        }, "defenderId": 2, "moveToHex": 4, "shootersBlockedDamage": 0, "shooting": false
+      },
+      {"affectedUnitIds": [
+          0
+        ], "damageDealt": 27, "damageReceived": {"collateral": 0, "retalitation": 100
+        }, "defenderId": 0, "moveToHex": 5, "shootersBlockedDamage": 0, "shooting": false
+      },
+      {"affectedUnitIds": [
+          0
+        ], "damageDealt": 27, "damageReceived": {"collateral": 0, "retalitation": 100
+        }, "defenderId": 0, "moveToHex": 8, "shootersBlockedDamage": 0, "shooting": false
+      },
+      {"affectedUnitIds": [
+          0
+        ], "damageDealt": 27, "damageReceived": {"collateral": 0, "retalitation": 100
+        }, "defenderId": 0, "moveToHex": 23, "shootersBlockedDamage": 0, "shooting": false
+      },
+      {"affectedUnitIds": [
+          0
+        ], "damageDealt": 27, "damageReceived": {"collateral": 0, "retalitation": 100
+        }, "defenderId": 0, "moveToHex": 24, "shootersBlockedDamage": 0, "shooting": false
+      },
+      {"affectedUnitIds": [
+          0
+        ], "damageDealt": 27, "damageReceived": {"collateral": 0, "retalitation": 100
+        }, "defenderId": 0, "moveToHex": 25, "shootersBlockedDamage": 0, "shooting": false
+      }
+    ], "possibleMoves": [
+      4,
+      5,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      22,
+      23,
+      24,
+      25,
+      27,
+      28,
+      29,
+      30,
+      31,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43,
+      44,
+      45,
+      46,
+      47,
+      48,
+      58,
+      59,
+      60,
+      61,
+      62,
+      63,
+      64,
+      65,
+      74,
+      75,
+      76,
+      77,
+      80,
+      81,
+      90,
+      91,
+      92,
+      93,
+      94,
+      95,
+      96,
+      97,
+      98,
+      107,
+      108,
+      109,
+      110,
+      111,
+      112,
+      113,
+      114,
+      125,
+      126,
+      127,
+      128,
+      129,
+      130,
+      131
+    ]
+  }, "activeStackId": 8, "battlefield": 3, "currentSide": 1, "order": [
+    [
+      {"canMove": true, "canRetalitate": true, "canWait": false, "defended": false, "id": 8, "initiative": 6, "queuePhase": 1, "speed": 6
+      },
+      {"canMove": true, "canRetalitate": false, "canWait": false, "defended": false, "id": 1, "initiative": 5, "queuePhase": 1, "speed": 5
+      },
+      {"canMove": true, "canRetalitate": true, "canWait": false, "defended": false, "id": 2, "initiative": 5, "queuePhase": 1, "speed": 5
+      }
+    ],
+    [
+      {"canMove": true, "canRetalitate": true, "canWait": false, "defended": false, "id": 0, "initiative": 9, "queuePhase": 1, "speed": 9
+      },
+      {"canMove": true, "canRetalitate": true, "canWait": false, "defended": false, "id": 3, "initiative": 7, "queuePhase": 1, "speed": 7
+      },
+      {"canMove": true, "canRetalitate": true, "canWait": false, "defended": false, "id": 6, "initiative": 6, "queuePhase": 1, "speed": 6
+      },
+      {"canMove": true, "canRetalitate": true, "canWait": false, "defended": false, "id": 8, "initiative": 6, "queuePhase": 1, "speed": 6
+      },
+      {"canMove": true, "canRetalitate": false, "canWait": false, "defended": false, "id": 1, "initiative": 5, "queuePhase": 1, "speed": 5
+      },
+      {"canMove": true, "canRetalitate": true, "canWait": false, "defended": false, "id": 2, "initiative": 5, "queuePhase": 1, "speed": 5
+      }
+    ],
+    [
+      {"canMove": true, "canRetalitate": true, "canWait": false, "defended": false, "id": 0, "initiative": 9, "queuePhase": 1, "speed": 9
+      },
+      {"canMove": true, "canRetalitate": true, "canWait": false, "defended": false, "id": 3, "initiative": 7, "queuePhase": 1, "speed": 7
+      },
+      {"canMove": true, "canRetalitate": true, "canWait": false, "defended": false, "id": 6, "initiative": 6, "queuePhase": 1, "speed": 6
+      },
+      {"canMove": true, "canRetalitate": true, "canWait": false, "defended": false, "id": 8, "initiative": 6, "queuePhase": 1, "speed": 6
+      },
+      {"canMove": true, "canRetalitate": false, "canWait": false, "defended": false, "id": 1, "initiative": 5, "queuePhase": 1, "speed": 5
+      },
+      {"canMove": true, "canRetalitate": true, "canWait": false, "defended": false, "id": 2, "initiative": 5, "queuePhase": 1, "speed": 5
+      }
+    ]
+  ], "stacks": [
+    {"ADDITIONAL_ATTACK": false, "ADDITIONAL_RETALIATION": true, "ATTACKS_NEAREST_CREATURE": false, "LIFE_DRAIN": false, "NO_DISTANCE_PENALTY": false, "NO_MELEE_PENALTY": false, "NO_RETALIATION": false, "THREE_HEADED_ATTACK": false, "TWO_HEX_ATTACK_BREATH": false, "attack": 8, "canCast": false, "canShoot": false, "creatureHealth": 25, "creatureLevel": 3, "creatureName": "griffin", "creatureType": 4, "defence": 8, "doubleWide": true, "healthLeft": 0, "hex": 8, "id": 5, "isClone": false, "isGhost": false, "luck": 0, "maxDamage": 6, "minDamage": 3, "morale": 1, "ranged": {"attack": 8, "defence": 8, "maxDamage": 6, "minDamage": 3
+      }, "shots": 0, "side": 1, "speed": 6, "stackCount": 0, "summoned": false, "totalHealthLeft": 0
+    },
+    {"ADDITIONAL_ATTACK": false, "ADDITIONAL_RETALIATION": true, "ATTACKS_NEAREST_CREATURE": false, "LIFE_DRAIN": false, "NO_DISTANCE_PENALTY": false, "NO_MELEE_PENALTY": false, "NO_RETALIATION": false, "THREE_HEADED_ATTACK": false, "TWO_HEX_ATTACK_BREATH": false, "attack": 8, "canCast": false, "canShoot": false, "creatureHealth": 25, "creatureLevel": 3, "creatureName": "griffin", "creatureType": 4, "defence": 8, "doubleWide": true, "healthLeft": 1, "hex": 20, "id": 6, "isClone": false, "isGhost": false, "luck": 0, "maxDamage": 6, "minDamage": 3, "morale": 1, "ranged": {"attack": 8, "defence": 8, "maxDamage": 6, "minDamage": 3
+      }, "shots": 0, "side": 1, "speed": 6, "stackCount": 1, "summoned": false, "totalHealthLeft": 1
+    },
+    {"ADDITIONAL_ATTACK": false, "ADDITIONAL_RETALIATION": true, "ATTACKS_NEAREST_CREATURE": false, "LIFE_DRAIN": false, "NO_DISTANCE_PENALTY": false, "NO_MELEE_PENALTY": false, "NO_RETALIATION": false, "THREE_HEADED_ATTACK": false, "TWO_HEX_ATTACK_BREATH": false, "attack": 8, "canCast": false, "canShoot": false, "creatureHealth": 25, "creatureLevel": 3, "creatureName": "griffin", "creatureType": 4, "defence": 8, "doubleWide": true, "healthLeft": 0, "hex": 18, "id": 7, "isClone": false, "isGhost": false, "luck": 0, "maxDamage": 6, "minDamage": 3, "morale": 1, "ranged": {"attack": 8, "defence": 8, "maxDamage": 6, "minDamage": 3
+      }, "shots": 0, "side": 1, "speed": 6, "stackCount": 0, "summoned": false, "totalHealthLeft": 0
+    },
+    {"ADDITIONAL_ATTACK": false, "ADDITIONAL_RETALIATION": true, "ATTACKS_NEAREST_CREATURE": false, "LIFE_DRAIN": false, "NO_DISTANCE_PENALTY": false, "NO_MELEE_PENALTY": false, "NO_RETALIATION": false, "THREE_HEADED_ATTACK": false, "TWO_HEX_ATTACK_BREATH": false, "attack": 8, "canCast": false, "canShoot": false, "creatureHealth": 25, "creatureLevel": 3, "creatureName": "griffin", "creatureType": 4, "defence": 8, "doubleWide": true, "healthLeft": 25, "hex": 26, "id": 8, "isClone": false, "isGhost": false, "luck": 0, "maxDamage": 6, "minDamage": 3, "morale": 1, "ranged": {"attack": 8, "defence": 8, "maxDamage": 6, "minDamage": 3
+      }, "shots": 0, "side": 1, "speed": 6, "stackCount": 7, "summoned": false, "totalHealthLeft": 175
+    },
+    {"ADDITIONAL_ATTACK": false, "ADDITIONAL_RETALIATION": false, "ATTACKS_NEAREST_CREATURE": false, "LIFE_DRAIN": false, "NO_DISTANCE_PENALTY": false, "NO_MELEE_PENALTY": false, "NO_RETALIATION": false, "THREE_HEADED_ATTACK": false, "TWO_HEX_ATTACK_BREATH": false, "attack": 10, "canCast": false, "canShoot": false, "creatureHealth": 16, "creatureLevel": 2, "creatureName": "obsidianGargoyle", "creatureType": 31, "defence": 12, "doubleWide": false, "healthLeft": 14, "hex": 7, "id": 0, "isClone": false, "isGhost": false, "luck": 0, "maxDamage": 3, "minDamage": 2, "morale": 3, "ranged": {"attack": 10, "defence": 12, "maxDamage": 3, "minDamage": 2
+      }, "shots": 0, "side": 0, "speed": 9, "stackCount": 38, "summoned": false, "totalHealthLeft": 606
+    },
+    {"ADDITIONAL_ATTACK": false, "ADDITIONAL_RETALIATION": false, "ATTACKS_NEAREST_CREATURE": false, "LIFE_DRAIN": false, "NO_DISTANCE_PENALTY": false, "NO_MELEE_PENALTY": false, "NO_RETALIATION": false, "THREE_HEADED_ATTACK": false, "TWO_HEX_ATTACK_BREATH": false, "attack": 7, "canCast": false, "canShoot": true, "creatureHealth": 4, "creatureLevel": 1, "creatureName": "masterGremlin", "creatureType": 29, "defence": 9, "doubleWide": false, "healthLeft": 4, "hex": 2, "id": 1, "isClone": false, "isGhost": false, "luck": 0, "maxDamage": 2, "minDamage": 1, "morale": 3, "ranged": {"attack": 7, "defence": 9, "maxDamage": 2, "minDamage": 1
+      }, "shots": 8, "side": 0, "speed": 5, "stackCount": 14, "summoned": false, "totalHealthLeft": 56
+    },
+    {"ADDITIONAL_ATTACK": false, "ADDITIONAL_RETALIATION": false, "ATTACKS_NEAREST_CREATURE": false, "LIFE_DRAIN": false, "NO_DISTANCE_PENALTY": false, "NO_MELEE_PENALTY": false, "NO_RETALIATION": false, "THREE_HEADED_ATTACK": false, "TWO_HEX_ATTACK_BREATH": false, "attack": 12, "canCast": false, "canShoot": false, "creatureHealth": 35, "creatureLevel": 3, "creatureName": "stoneGolem", "creatureType": 33, "defence": 15, "doubleWide": false, "healthLeft": 35, "hex": 3, "id": 2, "isClone": false, "isGhost": false, "luck": 0, "maxDamage": 5, "minDamage": 4, "morale": 0, "ranged": {"attack": 12, "defence": 15, "maxDamage": 5, "minDamage": 4
+      }, "shots": 0, "side": 0, "speed": 5, "stackCount": 6, "summoned": false, "totalHealthLeft": 210
+    },
+    {"ADDITIONAL_ATTACK": false, "ADDITIONAL_RETALIATION": false, "ATTACKS_NEAREST_CREATURE": false, "LIFE_DRAIN": false, "NO_DISTANCE_PENALTY": false, "NO_MELEE_PENALTY": true, "NO_RETALIATION": false, "THREE_HEADED_ATTACK": false, "TWO_HEX_ATTACK_BREATH": false, "attack": 15, "canCast": false, "canShoot": true, "creatureHealth": 30, "creatureLevel": 4, "creatureName": "archMage", "creatureType": 35, "defence": 14, "doubleWide": false, "healthLeft": 30, "hex": 137, "id": 3, "isClone": false, "isGhost": false, "luck": 0, "maxDamage": 9, "minDamage": 7, "morale": 3, "ranged": {"attack": 15, "defence": 14, "maxDamage": 9, "minDamage": 7
+      }, "shots": 24, "side": 0, "speed": 7, "stackCount": 4, "summoned": false, "totalHealthLeft": 120
+    },
+    {"ADDITIONAL_ATTACK": false, "ADDITIONAL_RETALIATION": false, "ATTACKS_NEAREST_CREATURE": false, "LIFE_DRAIN": false, "NO_DISTANCE_PENALTY": false, "NO_MELEE_PENALTY": false, "NO_RETALIATION": false, "THREE_HEADED_ATTACK": false, "TWO_HEX_ATTACK_BREATH": false, "attack": 15, "canCast": true, "canShoot": false, "creatureHealth": 40, "creatureLevel": 5, "creatureName": "masterGenie", "creatureType": 37, "defence": 17, "doubleWide": false, "healthLeft": 0, "hex": 25, "id": 4, "isClone": false, "isGhost": false, "luck": 0, "maxDamage": 16, "minDamage": 13, "morale": 3, "ranged": {"attack": 15, "defence": 17, "maxDamage": 16, "minDamage": 13
+      }, "shots": 0, "side": 0, "speed": 11, "stackCount": 0, "summoned": false, "totalHealthLeft": 0
+    }
+  ], "terrain": 0
+}

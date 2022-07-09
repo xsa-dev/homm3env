@@ -8,12 +8,12 @@ import sys
 import threading
 import time
 from datetime import datetime, timedelta
+
 from gym import Env
 
-
-from libs.common import start_vcmi_test_battle, kill_vcmi, check_connection, check_client_started
-
-from libs.homm3_state import homm3instance
+from libs.common import (check_client_started, check_connection, kill_vcmi,
+                         start_vcmi_test_battle)
+from libs.homm3_state import ml_service
 
 logging.basicConfig(
     level=logging.DEBUG,
@@ -27,13 +27,14 @@ logging.basicConfig(
 
 ###### OPTIONS ######
 isHeadless = False
-states = 100
-CONNECTION_TIMEOUT = 10
-CREATION_TIMEOUT = 10
+states = 3
+CONNECTION_TIMEOUT = 5
+CREATION_TIMEOUT = 5
 EPISODES = 2
 #####################
 
 ###### ENV VARIABLES ######
+# TODO: to class please
 conn = None
 request = None
 server_last_packet_time = None
@@ -45,7 +46,7 @@ class HoMM3_B(Env):
 
     def __init__(self):
         self.state = None
-        self.instance_state: homm3instance = homm3instance()
+        self.instance_state: ml_service = ml_service()
         logging.info('Проверьте включен ли BattleML в настройках vcmilauncher')
 
     def tcp_service(self):
@@ -103,6 +104,7 @@ class HoMM3_B(Env):
         target_varible: int = 0
         jaction = self.instance_state.prediction(request, target_varible)
         logging.info(f'>>> {self.instance_state.current_team} >>>')
+        logging.info(jaction)
 
         # waiting for new connection
         # send to vcmi battle ml service
@@ -137,7 +139,11 @@ class HoMM3_B(Env):
 
         # vcmi
         kill_vcmi()
-        time.sleep(5)
+        if isHeadless:
+            time.sleep(5)
+        else:
+            time.sleep(2)
+
         self.start_vcmi_threaded()
 
         # state
@@ -157,6 +163,9 @@ class HoMM3_B(Env):
         )
         self.homm3_game.start()
 
+    def actions(self) -> list:
+        return [1, 2, 3, 4]
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Process some integers.')
@@ -166,6 +175,7 @@ if __name__ == "__main__":
                         help='tcp host url')
     args = parser.parse_args()
 
+    # ENV test
     env = HoMM3_B()
 
     for episode in range(1, EPISODES + 1):
@@ -193,7 +203,7 @@ if __name__ == "__main__":
             # выполняем
             env.render()
             # выполнем выбор действия
-            action = random.choice([1, 2, 3, 4])
+            action = random.choice(env.actions())
             # получаем состояние, награду, признак завершения, информацию
             n_state, reward, done, info = env.step(action)
             # увеличиванием награду
@@ -202,5 +212,3 @@ if __name__ == "__main__":
                 n_state, score, reward, action, done, info))
 
         logging.info('Episode:{} Score:{}'.format(episode, score))
-
-    kill_vcmi()

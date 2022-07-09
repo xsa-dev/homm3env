@@ -1,3 +1,4 @@
+from cmath import log
 import json
 from typing import Dict
 from datetime import datetime
@@ -7,13 +8,15 @@ import deprecation
 
 logger = logging.getLogger(__name__)
 
-# TODO: from main or config?
+# TODO: now here, later in config.yaml from main.py
 BYTES_LENGHT = 32000
 BLOCK_LOGIC = True
 DEFAULT_LOGIC = False
 COMPUTER = 'COMPUTER'
 USER = 'ML'
 TIMEOUT = 0.1
+IS_SINGLED_USER = True
+WRITE_REQUEST = False
 ###########################
 
 
@@ -29,7 +32,7 @@ def singleton(class_):
 
 
 @singleton
-class homm3instance:
+class ml_service:
     def __init__(self):
         # server state variables (default)
         self.current_team = None
@@ -64,15 +67,21 @@ class homm3instance:
 
         self.env_function = None
 
+        # TODO: 
+        self.last_computer_request = None
+        self.last_ml_request = None
+
     def get_service_active_state(self) -> bool:
         # show timeout service state response
         current_timestamp = datetime.now().timestamp()
         if (TIMEOUT + self.last_connection_timestamp) - current_timestamp >= 0:
             return True
         else:
-            raise Exception('Timeout!! Too slow...')
+            logging.error('Timeout!! Too slow...')
+            return False
 
     def get_winner(self):
+        # TODO: fix logic after research
         if self.last_team == USER:
             self.winner = USER
         else:
@@ -100,19 +109,21 @@ class homm3instance:
             self.current_team = USER
             self.is_computer = False
             self.is_player = True
+            self.last_ml_request = request
         if request['currentSide'] == 1:
             self.current_team = COMPUTER
             self.is_computer = True
             self.is_player = False
+            self.last_computer_request
 
         logging.info(f'possible attacks: {self.possible_attacks}')
         logging.info(f'possible moves: {self.possible_moves}')
         logging.info(f'army count: {str(self.left_army_count)}')
         logging.info(f'army total health: {str(self.total_health_left)}')
-        logging.info(f'request: {request}')
+        if WRITE_REQUEST:
+            logging.info(f'request: {request}')
 
     def prediction(self, request, target_varible=0):
-        # logging.info(f'request: {request}')
         # TODO: this is fake logic, need implement real ml logic
         if len(request["actions"]["possibleAttacks"]) > 0:
             attack = request["actions"]["possibleAttacks"][0]
@@ -126,43 +137,46 @@ class homm3instance:
                 "type": 0,
                 "moveToHex": request["actions"]["possibleMoves"][0]
             }
-        # logging.info(f'action: {action}')
-        # logging.info(f'responses: {self.tcp_responses_counter}')
         # logging.info(f'@@@@ {self.last_connection_timestamp} @@@@')
         return action
 
+    def dump_to_json(self, research_folder):
+        #  TODO: implement save responses from RAM
+        pass
 
-    @deprecation.deprecated(deprecated_in="1.0", removed_in="2.0",
-                        details="Use the bar function instead")
-    def start_simple_tcp_server(self, host: str, port: int):
-        import socket
-        # Задаем адрес сервера
-        SERVER_ADDRESS = (host, port)
 
-        # Настраиваем сокет
-        server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    # @deprecation.deprecated(deprecated_in="1.0", removed_in="2.0",
+    #                     details="Use the bar function instead")
+    # def start_simple_tcp_server(self, host: str, port: int):
+    #     import socket
+    #     # Задаем адрес сервера
+    #     SERVER_ADDRESS = (host, port)
 
-        # Помечаем чтобы менй пустил дальше
-        self.server = True
+    #     # Настраиваем сокет
+    #     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    #     server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
-        server_socket.bind(SERVER_ADDRESS)
-        server_socket.listen(1)
-        logging.info('Simple Tcp Server is running. 1')
+    #     # Помечаем чтобы менй пустил дальше
+    #     self.server = True
 
-        # Слушаем запросы
-        while self.server:
-            connection, address = server_socket.accept()
-            logging.info("new connection from {address}".format(address=address))
-            data = connection.recv(BYTES_LENGHT)
+    #     server_socket.bind(SERVER_ADDRESS)
+    #     server_socket.listen(1)
+    #     logging.info('Simple Tcp Server is running. 1')
 
-            # processing logic
-            json_data = json.loads(data)
-            action = self.update(request=json_data)
+    #     # Слушаем запросы
+    #     while self.server:
+    #         connection, address = server_socket.accept()
+    #         logging.info("new connection from {address}".format(address=address))
+    #         data = connection.recv(BYTES_LENGHT)
 
-            # to vcmi
-            connection.send(json.dumps(action).encode('ascii'))
-            connection.close()
+    #         # processing logic
+    #         json_data = json.loads(data)
+    #         action = self.update(request=json_data)
 
-    def send_test_packet_for_current_connection(self):
+    #         # to vcmi
+    #         connection.send(json.dumps(action).encode('ascii'))
+    #         connection.close()
+
+    def send_heartbeat_to_vcmi_service(self):
+        # TODO: implement logic for heartbeat current vcmi instance
         pass
