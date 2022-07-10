@@ -3,7 +3,7 @@ import json
 import logging
 import sys
 
-from libs.homm3_state import ml_service
+from libs.battle_state import ml_service
 
 logger = logging.getLogger(__name__)
 
