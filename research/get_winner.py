@@ -12,4 +12,4 @@ if __name__ == '__main__':
   computer = open('/home/xsa-lin/DEV/homm3env/research/computer_last_battle.json')
   ml_data = json.load(ml)
   computer_date = json.load(computer)
-  print('')
+  print('', ml_data, computer_date)

@@ -3,11 +3,14 @@ import json
 import logging
 import sys
 
-from libs.homm3_state import ml_service
+from libs.homm3_state import MlService
 
 logger = logging.getLogger(__name__)
 
 BYTES_LENGHT = 32000
+
+LOG_INFO = False
+
 
 class TcpServer:
     def __init__(self):
@@ -36,7 +39,8 @@ class TcpServer:
             request.sendall(encoded_data)
 
     def start_tcp_server(self, host: str, port: int):
-        logging.info(f'TCPServer starting on {host}:{port}')
+        if LOG_INFO:
+            logging.info(f'TCPServer starting on {host}:{port}')
         try:
             with socketserver.TCPServer((host, port), TcpServer.TcpHandler, bind_and_activate=True) as self.server:
                 self.server.allow_reuse_address = True
@@ -45,13 +49,13 @@ class TcpServer:
             logging.critical(msg=f'Problem: {str(ex)}')
             sys.exit(1)
 
-
-
     def stop_tcp_server(self, method=None):
         if method is None:
             if self.server is not None:
                 self.server.shutdown()
                 self.server.server_close()
-                logging.info('Server stopped.')
+                if LOG_INFO:
+                    logging.info('Server stopped.')
             else:
-                logging.info('Server was not started.')
+                if LOG_INFO:
+                    logging.info('Server was not started.')

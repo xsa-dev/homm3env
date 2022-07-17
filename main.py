@@ -5,12 +5,10 @@ import logging
 import random
 import sys
 
-
 #### TEST ITERATIONS ####
-EPISODES = 2
+EPISODES = 10
 #### TEST VARIABLES ####
 IS_HEADLESS = True
-
 
 logging.basicConfig(
     level=logging.DEBUG,
@@ -22,18 +20,24 @@ logging.basicConfig(
 )
 
 
-if __name__ == "__main__":
+def parse_options():
+    # TODO: here options for ENV
     parser = argparse.ArgumentParser(description='Process some integers.')
-    parser.add_argument('--port', dest='port', default=9999,
+    parser.add_argument('--port', dest='port', default=9998,
                         help='tcp server port', type=int)
     parser.add_argument('--host', dest='host', default='localhost',
                         help='tcp host url')
-    args = parser.parse_args()
+    options = parser.parse_args()
+    return options
+
+
+if __name__ == "__main__":
+    options = parse_options()
 
     # ENV test
     env = HoMM3_B(
         headless=IS_HEADLESS
-        )
+    )
 
     for episode in range(1, EPISODES + 1):
         # reset сервер и vcmi
@@ -44,7 +48,7 @@ if __name__ == "__main__":
         while not done:
             # выполняем
             env.render()
-            # выполнем выбор действия
+            # выполняем выбор действия
             action = random.choice(env.actions())
             # получаем состояние, награду, признак завершения, информацию
             try:
@@ -53,7 +57,7 @@ if __name__ == "__main__":
                 logging.error(str(ex))
                 n_state, reward, done, info = env.state, 0, False, {'error': str(ex)}
                 env.reset()
-            # увеличиванием награду
+            # увеличиваем награду
             score += reward
             logging.info('$$$ EPISODE: {}: Step: {} Score: {} Reward: {} Action: {} Done: {} Info: {}'.format(
                 episode,

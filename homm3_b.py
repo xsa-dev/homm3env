@@ -15,7 +15,7 @@ from gym import Env
 
 from libs.common import (check_connection, kill_vcmi,
                          start_vcmi_test_battle, configure_tcp_socket, callback_vcmi)
-from libs.homm3_state import ml_service
+from libs.homm3_state import MlService
 
 logging.basicConfig(
     level=logging.DEBUG,
@@ -26,13 +26,16 @@ logging.basicConfig(
     ]
 )
 
-
 ###### OPTIONS ######
-states = 10
-CONNECTION_TIMEOUT = 25
+states = 100
+CONNECTION_TIMEOUT = 250
 CREATION_TIMEOUT = 5
 DEFAULT_VCMI_DEMO_WAITS = 3
 DEFAULT_VCMI_TRAIN_WAITS = 1
+
+LOG_CONNECTION = False
+LOG_INFO = False
+LOG_WARNING = False
 #####################
 
 ###### ENV VARIABLES ####
@@ -41,14 +44,20 @@ conn = None
 request = None
 server_last_packet_time = None
 client_start_timestamp = datetime.now().timestamp()
+
+
 #########################
 
 class HoMM3_B(Env):
 
     def __init__(self, headless):
+        self.homm3_game = None
         self.state = None
-        self.instance_state: ml_service = ml_service()
-        logging.info('Проверьте включен ли BattleML в настройках vcmilauncher')
+        # TODO: fix need drop MLServices in reset
+        self.instance_state: MlService = MlService()
+
+        if LOG_INFO:
+            logging.info('Проверьте включен ли BattleML в настройках vcmilauncher')
         self.server_last_packet_time = None
         self.isHeadless = headless
 
@@ -59,16 +68,17 @@ class HoMM3_B(Env):
 
         # create socket with default params
         server_socket = configure_tcp_socket()
-    
+
         # Слушаем запросы
         while True:
             connection, address = server_socket.accept()
-            logging.info(
-                "new connection from {address}".format(address=address))
+            if LOG_INFO:
+                logging.info(
+                    "new connection from {address}".format(address=address))
             data = connection.recv(32000)
             # фиксируем последнее обращение
             self.server_last_packet_time = datetime.now().timestamp()
-            
+
             # to processing logic
             json_data = json.loads(data)
 
@@ -78,7 +88,9 @@ class HoMM3_B(Env):
             # TODO: this is response from server
             request = json_data
             conn = connection
-            logging.info(connection)
+
+            if LOG_CONNECTION:
+                logging.info(connection)
 
     def reset(self):
         if not hasattr(self, 'simple_service'):
@@ -99,7 +111,21 @@ class HoMM3_B(Env):
         # state
         self.state = states
 
+
         return self.state
+
+    def callback_vcmi_json(self, jaction):
+        # TODO: minor fix always open vcmiclient port
+        # TODO: refactor please
+        # waiting for new connection
+        global conn
+        global request
+        conn.send(json.dumps(jaction).encode('ascii'))
+        if LOG_INFO:
+            logging.log(logging.INFO, f'send to battle-ml: {jaction}')
+        conn.close()
+        conn = None
+        request = None
 
     def step(self, action):
         # wait from environment and make action
@@ -107,35 +133,38 @@ class HoMM3_B(Env):
         global request
         global conn
 
+        done = False
         # TODO: wait connection or request or engine in separate functions
         wait_counter = 0
         while request is None or conn is None:
-            wait_counter+=1
-            time.sleep(1)
-            logging.warn(f'Waits backend connection... {wait_counter} sec.')
+            wait_counter += 1
+            time.sleep(0.1)
+            if wait_counter % 10 == 0:
+                logging.log(logging.WARNING, f'Waits backend connection... {wait_counter / 10} sec.')
             if wait_counter > CONNECTION_TIMEOUT:
                 raise Exception('Bad tcp connection')
 
-
         # logging выбора значений
         target_varible: int = 0
+        # TODO: fix defect export prediction to Keras
         jaction = self.instance_state.prediction(request, target_varible)
-        logging.info(f'>>> {self.instance_state.current_team} >>>')
-        logging.info(jaction)
 
-        # waiting for new connection
+        if LOG_INFO:
+            logging.info(f'>>> {self.instance_state.current_team} >>>')
+            logging.info(jaction)
+
         # send to vcmi battle ml service
-        # TODO: minor fix always open vcmiclient port        
-        # TODO: refactor please
-        # callback_vcmi(conn, jaction)
-        conn.send(json.dumps(jaction).encode('ascii'))
-        conn.close()
-        conn = None
-        request = None
+        self.callback_vcmi_json(jaction)
+
 
         # TODO: if step success reward++ else nothing bad
-        reward = 1
-        done = False
+        if self.instance_state.game_end:
+            done = True
+            self.instance_state.reset()
+            reward = 1
+        else:
+            reward = 1
+            done = False
 
         # TODO: replace fake with minimization for army here
         self.state -= 1
@@ -150,7 +179,8 @@ class HoMM3_B(Env):
     def hard_reset(self):
         global server_last_packet_time
         server_last_packet_time = datetime.now().timestamp()
-        logging.warning('Service not respond.')
+        if LOG_WARNING:
+            logging.warning('Service not respond.')
         self.kill()
         self.start_vcmi_threaded()
 
@@ -171,6 +201,3 @@ class HoMM3_B(Env):
 
     def actions(self) -> list:
         return [1, 2, 3, 4]
-
-
-
