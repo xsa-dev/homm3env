@@ -15,7 +15,9 @@ from gym import Env
 
 from libs.common import (check_connection, kill_vcmi,
                          start_vcmi_test_battle, configure_tcp_socket, callback_vcmi)
+
 from libs.homm3_state import MlService
+
 
 logging.basicConfig(
     level=logging.DEBUG,

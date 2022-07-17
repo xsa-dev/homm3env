@@ -3,6 +3,7 @@ import json
 import logging
 import sys
 
+
 from libs.homm3_state import MlService
 
 logger = logging.getLogger(__name__)
