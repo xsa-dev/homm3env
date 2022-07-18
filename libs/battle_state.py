@@ -36,7 +36,7 @@ def singleton(class_):
 class MlService:
     def reset(self):
         # todo: DRY
-        self.current_team = None
+        self.current_team = USER
         self.tcp_responses_counter = 0
         self.last_connection_timestamp = 0
         self.is_service_active = None
@@ -63,13 +63,13 @@ class MlService:
 
         # army's properties
         self.left_total_health = None
-        self.left_army_count = None
+        self.left_army_count = [-1, -1]
         self.left_max_damage = None
         self.left_min_damage = None
         self.left_attack = None
 
         self.right_total_health = None
-        self.right_army_count = None
+        self.right_army_count = [-1, -1]
         self.right_max_damage = None
         self.right_min_damage = None
         self.right_attack = None
@@ -108,13 +108,13 @@ class MlService:
 
         # army's properties
         self.left_total_health = None
-        self.left_army_count = None
+        self.left_army_count = [-1, -1]
         self.left_max_damage = None
         self.left_min_damage = None
         self.left_attack = None
 
         self.right_total_health = None
-        self.right_army_count = None
+        self.right_army_count = [-1, -1]
         self.right_max_damage = None
         self.right_min_damage = None
         self.right_attack = None
@@ -136,24 +136,23 @@ class MlService:
     def get_winner(self):
         # TODO: fix logic after research
         if self.right_army_count is not None:
-            if self.possible_attacks == 1:
-                # todo: fix logic for army health and attack properties calculating
-                if self.current_team == USER:
-                    self.winner = USER
-                    self.game_end = True
-                    return True
+            if self.right_army_count[1] > 10:
+                return False
 
-            if self.possible_attacks == 1:
+            # TODO: logic fix fix fix
+            if self.left_army_count[1] > 25 and self.right_army_count[1] < 5:
                 # todo: fix logic for army health and attack properties calculating
-                if self.current_team == COMPUTER:
+                if self.right_army_count[1] > self.left_army_count[1]:
                     self.winner = COMPUTER
                     self.game_end = True
                     return True
 
-        if self.last_team == USER:
-            self.winner = USER
-        else:
-            self.winner = COMPUTER
+                if self.left_army_count[1] > self.right_army_count[1]:
+                    self.winner = USER
+                    self.game_end = True
+                    return True
+            else:
+                return False
 
     def get_possible_attacks(self):
         return len(self.request['actions']['possibleAttacks'])
@@ -161,7 +160,7 @@ class MlService:
     def get_possible_moves(self):
         return len(self.request['actions']['possibleMoves'])
 
-    def get_total_health(self):
+    def get_total_health(self, side=None):
         total_health = 0
         for stack in self.request['stacks']:
             if stack['stackCount'] is not None:
@@ -175,19 +174,37 @@ class MlService:
                         total_health += int(stack['healthLeft'])
         return total_health
 
-    def get_army_count(self):
-        army_count = 0
+    def get_army_count(self, side=None):
+        if side is None:
+            raise Exception('Specify side!')
+
+        army_count_computer = 0
+        army_count_user = 0
         for stack in self.request['stacks']:
             if stack['stackCount'] is not None:
-                if self.current_team == COMPUTER:
-                    if stack['side'] == 1:
-                        army_count += int(stack['stackCount'])
-                if self.current_team == USER:
-                    if stack['side'] == 0:
-                        army_count += int(stack['stackCount'])
-        return army_count
+                if stack['side'] == 1:
+                    army_count_computer += int(stack['stackCount'])
+                if stack['side'] == 0:
+                    army_count_user += int(stack['stackCount'])
 
-    def get_army_attack_max_damage(self):
+        # len of states must be size 2. 0 - for last and 1 - for current
+        if side == COMPUTER:
+            if len(self.right_army_count) == 2:
+                self.right_army_count.pop(0)
+                self.right_army_count.append(army_count_computer)
+            else:
+                raise Exception('Desync computer army counter!')
+
+        if side == USER:
+            if len(self.left_army_count) == 2:
+                self.left_army_count.pop(0)
+                self.left_army_count.append(army_count_user)
+            else:
+                raise Exception('Desync user army counter!')
+
+        return army_count_computer if side == COMPUTER else army_count_user
+
+    def get_army_attack_max_damage(self, side=None):
         army_max_damage = 0
         for stack in self.request['stacks']:
             if stack['stackCount'] is not None:
@@ -199,7 +216,7 @@ class MlService:
                         army_max_damage += int(stack['maxDamage'])
         return army_max_damage
 
-    def get_army_attack_min_damage(self):
+    def get_army_attack_min_damage(self, side=None):
         army_min_damage = 0
         for stack in self.request['stacks']:
             if stack['stackCount'] is not None:
@@ -211,7 +228,7 @@ class MlService:
                         army_min_damage += int(stack['minDamage'])
         return army_min_damage
 
-    def get_army_attack(self):
+    def get_army_attack(self, side=None):
         army_attack = 0
         for stack in self.request['stacks']:
             if stack['stackCount'] is not None:
@@ -236,11 +253,12 @@ class MlService:
             self.last_ml_request = request
             self.possible_attacks = self.get_possible_attacks()
             self.possible_moves = self.get_possible_moves()
-            self.left_army_count = self.get_army_count()
-            self.left_total_health = self.get_total_health()
-            self.left_attack = self.get_army_attack()
-            self.left_max_damage = self.get_army_attack_max_damage()
-            self.left_min_damage = self.get_army_attack_min_damage()
+
+        self.get_army_count(side=USER)
+        self.left_total_health = self.get_total_health(side=USER)
+        self.left_attack = self.get_army_attack(side=USER)
+        self.left_max_damage = self.get_army_attack_max_damage(side=USER)
+        self.left_min_damage = self.get_army_attack_min_damage(side=USER)
 
         if request['currentSide'] == 1:
             self.current_team = COMPUTER
@@ -249,11 +267,12 @@ class MlService:
             self.last_computer_request = request
             self.possible_attacks = self.get_possible_attacks()
             self.possible_moves = self.get_possible_moves()
-            self.right_army_count = self.get_army_count()
-            self.right_total_health = self.get_total_health()
-            self.right_attack = self.get_army_attack()
-            self.right_max_damage = self.get_army_attack_max_damage()
-            self.right_min_damage = self.get_army_attack_min_damage()
+
+        self.get_army_count(side=COMPUTER)
+        self.right_total_health = self.get_total_health(side=COMPUTER)
+        self.right_attack = self.get_army_attack(side=COMPUTER)
+        self.right_max_damage = self.get_army_attack_max_damage(side=COMPUTER)
+        self.right_min_damage = self.get_army_attack_min_damage(side=COMPUTER)
 
         if LOG_INFO:
             logging.info(f'>> {self.current_team} #{self.tcp_responses_counter} at {self.last_connection_timestamp} >>')

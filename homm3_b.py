@@ -16,7 +16,7 @@ from gym import Env
 from libs.common import (check_connection, kill_vcmi,
                          start_vcmi_test_battle, configure_tcp_socket, callback_vcmi)
 
-from libs.homm3_state import MlService
+from libs.battle_state import MlService
 
 
 logging.basicConfig(
@@ -112,7 +112,7 @@ class HoMM3_B(Env):
 
         # state
         self.state = states
-
+        self.instance_state.reset()
 
         return self.state
 
@@ -151,27 +151,33 @@ class HoMM3_B(Env):
         # TODO: fix defect export prediction to Keras
         jaction = self.instance_state.prediction(request, target_varible)
 
-        if LOG_INFO:
-            logging.info(f'>>> {self.instance_state.current_team} >>>')
-            logging.info(jaction)
-
-        # send to vcmi battle ml service
-        self.callback_vcmi_json(jaction)
-
-
+        # TODO: replace fake with minimization for army here
+        # TODO: logic: here need to get equivalent last state with current
         # TODO: if step success reward++ else nothing bad
+        self.state -= 1
+        if self.state <= 0:
+            done = True
+
+        # set army's count logic
+        reward = 0
+        if self.instance_state.right_army_count[0] > self.instance_state.right_army_count[1]:
+            if self.instance_state.right_army_count[0] != -1 and self.instance_state.right_army_count[1] != -1:
+                reward = self.instance_state.right_army_count[0] - self.instance_state.right_army_count[1]
+
+        # get game state done
         if self.instance_state.game_end:
             done = True
             self.instance_state.reset()
             reward = 1
-        else:
-            reward = 1
-            done = False
 
-        # TODO: replace fake with minimization for army here
-        self.state -= 1
-        if self.state <= 0:
-            done = True
+        else:
+            # send to vcmi battle ml service
+            if LOG_INFO:
+                logging.info(f'>>> {self.instance_state.current_team} >>>')
+                logging.info(jaction)
+            self.callback_vcmi_json(jaction)
+            reward = reward
+            done = False
 
         # info
         info = dict()
