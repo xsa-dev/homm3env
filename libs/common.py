@@ -14,7 +14,7 @@ def kill_vcmi():
 
 def start_vcmi_test_battle(headless=False):
     vcmi_client_path_with_args = \
-        r'C:\VCMI\build\bin\Release\VCMI_client.exe'
+        r'C:\VCMI\VCMI_client.exe'
         # r'C:\VCMI\build\bin\Release\VCMI_client.exe --spectate --spectate-hero-speed 1 --spectate-battle-speed 1 --spectate-skip-battle-result --onlyAI --ai EmptyAI --disable-video --testmap C:\\VCMI\build\bin\Release\maps\template-d1.h3m'
 
     # print('SYSTEM')
