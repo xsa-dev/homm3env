@@ -1,3 +1,4 @@
+import random
 from cmath import log
 import json
 from typing import Dict
@@ -10,6 +11,7 @@ logger = logging.getLogger(__name__)
 # TODO: now here, later in config.yaml from main.py
 BYTES_LENGHT = 32000
 BLOCK_LOGIC = True
+FAKE_TARGET = False
 DEFAULT_LOGIC = False
 COMPUTER = 'COMPUTER'
 USER = 'ML'
@@ -17,6 +19,7 @@ TIMEOUT = 0.1
 IS_SINGLED_USER = True
 WRITE_REQUEST = False
 LOG_INFO = False
+
 
 ###########################
 
@@ -298,10 +301,29 @@ class MlService:
         if WRITE_REQUEST:
             logging.info(f'request: {request}')
 
-    def prediction(self, request, target_varible=0):
+    def make_prediction(self, request, action: int, target_varible=0):
+        # TODO: remove fake logic!!
         # TODO: this is fake logic, need implement real ml magic
-        if len(request["actions"]["possibleAttacks"]) > 0:
+        if random.randint(1, 10) == 1:
+            # TODO: how to wait?
+            pass
+        if random.randint(1, 10) == 2:
+            # TODO: how defend?
+            pass
+
+        if len(request["actions"]["possibleAttacks"]) > 0 and FAKE_TARGET:
             attack = request["actions"]["possibleAttacks"][0]
+            action = {
+                "type": 1 if attack["shooting"] else 2,
+                "targetId": attack["defenderId"],
+                "moveToHex": attack["moveToHex"]
+            }
+        elif len(request["actions"]["possibleAttacks"]) > 0:
+            # random target
+            count = len(request["actions"]["possibleAttacks"]) - 1 if (len(
+                request["actions"]["possibleAttacks"]) - 1) > 0 else 0
+            action = random.randint(0, count)
+            attack = request["actions"]["possibleAttacks"][action]
             action = {
                 "type": 1 if attack["shooting"] else 2,
                 "targetId": attack["defenderId"],
@@ -312,7 +334,6 @@ class MlService:
                 "type": 0,
                 "moveToHex": request["actions"]["possibleMoves"][0]
             }
-        # logging.info(f'@@@@ {self.last_connection_timestamp} @@@@')
         return action
 
     def dump_to_json(self, research_folder):

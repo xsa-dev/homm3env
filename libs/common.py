@@ -4,15 +4,18 @@ import os
 import logging
 from datetime import datetime
 
-
 logger = logging.getLogger(__name__)
 
 import socket
 
+LOGGING = False
+
+
 def kill_vcmi():
     os.system("killall -9 vcmiserver")
     os.system("killall -9 vcmiclient")
-    logging.info('vcmi killed.')
+    if LOGGING:
+        logging.info('vcmi killed.')
 
 
 def start_vcmi_test_battle(headless=False, release=True):
@@ -34,7 +37,8 @@ def start_vcmi_test_battle(headless=False, release=True):
 
     # start process
     os.system(vcmi_client_path_with_args + ' > /dev/null 2>&1')
-    logging.debug(vcmi_client_path_with_args)
+    if LOGGING:
+        logging.debug(vcmi_client_path_with_args)
     logging.info('vcmi started.')
 
 
@@ -80,6 +84,7 @@ def wait_request_or_conn(state, request, conn):
         return True
     return state, 0, False, {}
 
+
 def configure_tcp_socket():
     try:
         SERVER_ADDRESS = ('localhost', 9999)
@@ -96,8 +101,8 @@ def configure_tcp_socket():
     except Exception as ex:
         raise ex
 
+
 def callback_vcmi(conn, json):
     # TODO util for env step
     conn.send(json.dumps(json).encode('ascii'))
     conn.close()
-    

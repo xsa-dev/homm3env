@@ -1,6 +1,6 @@
 import time
 
-from homm3_b import HoMM3_B
+from homm3battle import HoMM3Battle
 from datetime import datetime
 import argparse
 import logging
@@ -10,7 +10,7 @@ import sys
 #### TEST ITERATIONS ####
 EPISODES = 10
 #### TEST VARIABLES ####
-IS_HEADLESS = True
+IS_HEADLESS = False
 
 ## DEF ###
 done = False
@@ -40,37 +40,25 @@ if __name__ == "__main__":
     options = parse_options()
 
     # ENV test
-    env = HoMM3_B(
+    env = HoMM3Battle(
         headless=IS_HEADLESS
     )
 
+    # TODO: preprocess logic to ML models for baselines
     for episode in range(1, EPISODES + 1):
         # reset сервер и vcmi
         state = env.reset()
-        if done == True:
-            time.sleep(3)
-        done = False
-        score = 0
-        # пока игра не закончена
-        while not done:
-            # выполняем
-            env.render()
 
+        # init value of env variables
+        done, score = False, 0
+        while not done:
+            env.render()
             # выполняем выбор действия
             action = random.choice(env.actions())
-
-            # получаем состояние, награду, признак завершения, информацию
-            try:
-                n_state, reward, done, info = env.step(action)
-            except Exception as ex:
-                logging.error(str(ex))
-                n_state, reward, done, info = env.state, 0, False, {'error': str(ex)}
-                env.reset()
-            # увеличиваем награду
+            steps, reward, done, info = env.step(action)
             score += reward
             logging.info('$$$ EPISODE: {}: Step: {} Score: {} Reward: {} Action: {} Done: {} Info: {}'.format(
-                episode,
-                n_state, score, reward, action, done, info))
+                episode, steps, score, reward, action, done, info))
 
     logging.info('### Episodes:{}, Score:{} ###'.format(episode, score))
     env.kill()
