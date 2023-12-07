@@ -15,3 +15,6 @@ Later we plan add install enviroment from packages repository.
 [] - работа с фреймворками машинного обучения
 [] - установка из пакета
 [] - ...
+
+
+#proj_soc1_heroes3
